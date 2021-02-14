@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
+import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -59,47 +60,85 @@ public class FluxTest {
 //				subscription -> subscription.request(3));
 //
 //	}
+//	@Test
+//	public void FluxWithUglyBackPressure() {
+//
+//		Flux<Integer> range = Flux.range(1, 10).log();
+//
+//		range.subscribe(new Subscriber() {
+//
+//			private Subscription subscription;
+//			private int count = 0;
+//			private int requestcount = 2;
+//			
+//
+//			@Override
+//			public void onSubscribe(Subscription s) {
+//				// TODO Auto-generated method stub
+//				this.subscription = s;
+//				this.subscription.request(requestcount);
+//			}
+//
+//			@Override
+//			public void onNext(Object t) {
+//				// TODO Auto-generated method stub
+//				count++;
+//				if(count>=requestcount) {
+//					count =0;
+//					this.subscription.request(requestcount);
+//				}
+//			}
+//
+//			@Override
+//			public void onError(Throwable t) {
+//				// TODO Auto-generated method stub
+//
+//			}
+//
+//			@Override
+//			public void onComplete() {
+//				// TODO Auto-generated method stub
+//
+//			}
+//		});
+//		
+////		StepVerifier.create(range).expectNext(1,2,3,4,5,6,7,8,9,10).verifyComplete();
+//	}
 	@Test
-	public void FluxWithUglyBackPressure() {
+	public void FluxWithNotSoUglyBackPressure() {
 
 		Flux<Integer> range = Flux.range(1, 10).log();
 
-		range.subscribe(new Subscriber() {
-
+		range.subscribe(new BaseSubscriber<Integer>() {
+		
 			private Subscription subscription;
-			private int count = 0;
-			private int requestcount = 2;
+			private int requestcount=2;
+			private int count=0;
 			
-
-			@Override
-			public void onSubscribe(Subscription s) {
-				// TODO Auto-generated method stub
-				this.subscription = s;
+			protected void hookOnSubscribe(Subscription subscription){
+//				subscription.request(Long.MAX_VALUE);
+				this.subscription=subscription;
 				this.subscription.request(requestcount);
 			}
 
-			@Override
-			public void onNext(Object t) {
-				// TODO Auto-generated method stub
+			/**
+			 * Hook for processing of onNext values. You can call {@link #request(long)} here
+			 * to further request data from the source {@link org.reactivestreams.Publisher} if
+			 * the {@link #hookOnSubscribe(Subscription) initial request} wasn't unbounded.
+			 * <p>Defaults to doing nothing.
+			 *
+			 * @param value the emitted value to process
+			 */
+			protected void hookOnNext(Integer value){
+				// NO-OP
+//				super.hookOnNext(value);
 				count++;
 				if(count>=requestcount) {
 					count =0;
 					this.subscription.request(requestcount);
 				}
 			}
-
-			@Override
-			public void onError(Throwable t) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onComplete() {
-				// TODO Auto-generated method stub
-
-			}
-		});
+		} );
 		
 //		StepVerifier.create(range).expectNext(1,2,3,4,5,6,7,8,9,10).verifyComplete();
 	}
