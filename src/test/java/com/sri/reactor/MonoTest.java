@@ -46,17 +46,32 @@ public class MonoTest {
 //		
 //		
 //	}
-	@Test
-	public void mono_doOnMethods() {
-//		Mono<String> just = Mono.just("sri").log().map(String::toUpperCase);
+//	@Test
+//	public void mono_doOnMethods() {
+////		Mono<String> just = Mono.just("sri").log().map(String::toUpperCase);
+//
+//		Mono<String> just = Mono.just("Sri").doOnSubscribe(subscription -> log.info("subscribed"))
+//				.doOnRequest((longnumber) -> log.info("Number of items requested" + longnumber))
+//				.doOnNext((s)->log.info("when called on next do this"+s))
+//				.doOnSuccess((s)->log.info("do on success executed"));
+//
+//		just.subscribe((s) -> log.info(s), Throwable::getLocalizedMessage, () -> log.info("finished"),
+//				subcription -> subcription.request(5));
+//
+//	}
+//	
+	// do on error methods
 
-		Mono<String> just = Mono.just("Sri").doOnSubscribe(subscription -> log.info("subscribed"))
-				.doOnRequest((longnumber) -> log.info("Number of items requested" + longnumber))
-				.doOnNext((s)->log.info("when called on next do this"+s))
-				.doOnSuccess((s)->log.info("do on success executed"));
+//	@Test
+//	public void mono_doOnErorMethods() {
+//
+//		Mono<Object> log2 = Mono.error(new RuntimeException("ex")).doOnError(s-> log.info("do on error called"+s.getLocalizedMessage()))
+//		.log();
+//		
+////		log2.subscribe(s -> log.
+////				info("received s {}",s));
+//		
+//		StepVerifier.create(log2).expectErrorMessage("ex").verify();
+//	}
 
-		just.subscribe((s) -> log.info(s), Throwable::getLocalizedMessage, () -> log.info("finished"),
-				subcription -> subcription.request(5));
-
-	}
 }
