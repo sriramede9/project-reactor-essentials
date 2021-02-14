@@ -1,5 +1,6 @@
 package com.sri.reactor;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -104,42 +105,76 @@ public class FluxTest {
 //		
 ////		StepVerifier.create(range).expectNext(1,2,3,4,5,6,7,8,9,10).verifyComplete();
 //	}
+//	@Test
+//	public void FluxWithNotSoUglyBackPressure() {
+//
+//		Flux<Integer> range = Flux.range(1, 10).log();
+//
+//		range.subscribe(new BaseSubscriber<Integer>() {
+//		
+//			private Subscription subscription;
+//			private int requestcount=2;
+//			private int count=0;
+//			
+//			protected void hookOnSubscribe(Subscription subscription){
+////				subscription.request(Long.MAX_VALUE);
+//				this.subscription=subscription;
+//				this.subscription.request(requestcount);
+//			}
+//
+//			/**
+//			 * Hook for processing of onNext values. You can call {@link #request(long)} here
+//			 * to further request data from the source {@link org.reactivestreams.Publisher} if
+//			 * the {@link #hookOnSubscribe(Subscription) initial request} wasn't unbounded.
+//			 * <p>Defaults to doing nothing.
+//			 *
+//			 * @param value the emitted value to process
+//			 */
+//			protected void hookOnNext(Integer value){
+//				// NO-OP
+////				super.hookOnNext(value);
+//				count++;
+//				if(count>=requestcount) {
+//					count =0;
+//					this.subscription.request(requestcount);
+//				}
+//			}
+//		} );
+//		
+////		StepVerifier.create(range).expectNext(1,2,3,4,5,6,7,8,9,10).verifyComplete();
+//	}
+
+//	@Test
+//	public void test_Flux_interval() throws InterruptedException {
+//
+//		Flux<Long> log = Flux
+//				.interval(Duration.ofMillis(20))
+//				.take(9)
+//				.log();
+//
+//		log.subscribe(System.out::println);
+//
+//		Thread.sleep(300);
+//	}
 	@Test
-	public void FluxWithNotSoUglyBackPressure() {
+	public void test_Flux_intervalWithStepVerifier() throws InterruptedException {
 
-		Flux<Integer> range = Flux.range(1, 10).log();
+		Flux<Long> log = intervalFlux();
 
-		range.subscribe(new BaseSubscriber<Integer>() {
+		log.subscribe(System.out::println);
 		
-			private Subscription subscription;
-			private int requestcount=2;
-			private int count=0;
-			
-			protected void hookOnSubscribe(Subscription subscription){
-//				subscription.request(Long.MAX_VALUE);
-				this.subscription=subscription;
-				this.subscription.request(requestcount);
-			}
+		StepVerifier.withVirtualTime(this::intervalFlux)
+		.expectSubscription()
+		.thenAwait(Duration.ofDays(3))
+		.expectNext(0l, 1l)
+		.thenCancel()
+		.verify();
 
-			/**
-			 * Hook for processing of onNext values. You can call {@link #request(long)} here
-			 * to further request data from the source {@link org.reactivestreams.Publisher} if
-			 * the {@link #hookOnSubscribe(Subscription) initial request} wasn't unbounded.
-			 * <p>Defaults to doing nothing.
-			 *
-			 * @param value the emitted value to process
-			 */
-			protected void hookOnNext(Integer value){
-				// NO-OP
-//				super.hookOnNext(value);
-				count++;
-				if(count>=requestcount) {
-					count =0;
-					this.subscription.request(requestcount);
-				}
-			}
-		} );
-		
-//		StepVerifier.create(range).expectNext(1,2,3,4,5,6,7,8,9,10).verifyComplete();
+//		Thread.sleep(300);
 	}
+
+	private Flux<Long> intervalFlux() {
+		return Flux.interval(Duration.ofDays(1)).take(10).log();
+	}
+
 }
