@@ -81,16 +81,45 @@ public class Operators {
 //	public Flux<Object> return_Empty_Flux() {
 //		return Flux.empty();
 //	}
-	
+
+//	@Test
+//	public void test_Defer_Flux() {
+//		
+//		Flux<Long> defer = Flux.defer(()->Mono.just(System.currentTimeMillis()));
+//		
+//		defer.subscribe(System.out::println);
+//		defer.subscribe(System.out::println);
+//		defer.subscribe(System.out::println);
+//		defer.subscribe(System.out::println);
+//		defer.subscribe(System.out::println);
+//	}
+
+	// flux concat
+
+//	@Test
+//	public void concatFlux() {
+//		Flux<Integer> flux1 = Flux.just(1, 2, 3);
+//		Flux<Integer> flux2 = Flux.just(4, 5);
+//
+//		Flux<Integer> concat = Flux.concat(flux1, flux2).log();
+//
+////		concat.subscribe(System.out::println);
+//		
+//		StepVerifier.create(concat)
+//		.expectSubscription()
+//		.expectNext(1, 2, 3, 4, 5)
+//		.verifyComplete();
+//	}
 	@Test
-	public void test_Defer_Flux() {
-		
-		Flux<Long> defer = Flux.defer(()->Mono.just(System.currentTimeMillis()));
-		
-		defer.subscribe(System.out::println);
-		defer.subscribe(System.out::println);
-		defer.subscribe(System.out::println);
-		defer.subscribe(System.out::println);
-		defer.subscribe(System.out::println);
+	public void concatWithFlux() {
+		Flux<Integer> flux1 = Flux.just(1, 2, 3);
+		Flux<Integer> flux2 = Flux.just(4, 5);
+
+		Flux<Integer> concat = flux1.concatWith(flux2).log();
+
+//		concat.subscribe(System.out::println);
+
+		StepVerifier.create(concat).expectSubscription().expectNext(1, 2, 3, 4, 5).verifyComplete();
 	}
+
 }
