@@ -54,17 +54,43 @@ public class Operators {
 //		
 //	}
 
+//	@Test
+//	public void test_File() {
+//
+//		Mono<List<String>> fromCallable = Mono.fromCallable(() -> Files.readAllLines(Path.of("test.txt"))).log()
+//				.subscribeOn(Schedulers.boundedElastic());
+//
+////		fromCallable.subscribe(System.out::println);
+//
+//		StepVerifier.create(fromCallable).expectSubscription().thenConsumeWhile(file -> {
+//			System.out.println(file.size());
+//			return file.size() > 0;
+//		}).verifyComplete();
+//	}
+
+//	@Test
+//	public void Test_Swith_IF_Empty() {
+//
+//		Flux<Object> return_Empty_Flux = return_Empty_Flux();
+//
+//		Flux<Object> log2 = return_Empty_Flux.switchIfEmpty(Flux.just("Not empty Anymore")).log();
+//		
+//		StepVerifier.create(log2).expectSubscription().expectNext("Not empty Anymore").verifyComplete();
+//	}
+//
+//	public Flux<Object> return_Empty_Flux() {
+//		return Flux.empty();
+//	}
+	
 	@Test
-	public void test_File() {
-
-		Mono<List<String>> fromCallable = Mono.fromCallable(() -> Files.readAllLines(Path.of("test.txt"))).log()
-				.subscribeOn(Schedulers.boundedElastic());
-
-//		fromCallable.subscribe(System.out::println);
-
-		StepVerifier.create(fromCallable).expectSubscription().thenConsumeWhile(file -> {
-			System.out.println(file.size());
-			return file.size() > 0;
-		}).verifyComplete();
+	public void test_Defer_Flux() {
+		
+		Flux<Long> defer = Flux.defer(()->Mono.just(System.currentTimeMillis()));
+		
+		defer.subscribe(System.out::println);
+		defer.subscribe(System.out::println);
+		defer.subscribe(System.out::println);
+		defer.subscribe(System.out::println);
+		defer.subscribe(System.out::println);
 	}
 }
