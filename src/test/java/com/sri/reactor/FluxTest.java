@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.BaseSubscriber;
+import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+@Slf4j
 public class FluxTest {
 
 //	@Test
@@ -156,25 +159,63 @@ public class FluxTest {
 //
 //		Thread.sleep(300);
 //	}
-	@Test
-	public void test_Flux_intervalWithStepVerifier() throws InterruptedException {
 
-		Flux<Long> log = intervalFlux();
+//	@Test
+//	public void test_pretty_Back_pressure() {
+//
+//		Flux<Integer> flux = Flux
+//				.range(1, 10)
+//				.log()
+//				.limitRate(3);
+//
+//		flux.subscribe(System.out::println);
+//	}
 
-		log.subscribe(System.out::println);
-		
-		StepVerifier.withVirtualTime(this::intervalFlux)
-		.expectSubscription()
-		.thenAwait(Duration.ofDays(3))
-		.expectNext(0l, 1l)
-		.thenCancel()
-		.verify();
-
-//		Thread.sleep(300);
-	}
+//	@Test
+//	public void test_Flux_intervalWithStepVerifier() throws InterruptedException {
+//
+//		Flux<Long> log = intervalFlux();
+//
+//		log.subscribe(System.out::println);
+//		
+//		StepVerifier.withVirtualTime(this::intervalFlux)
+//		.expectSubscription()
+//		.thenAwait(Duration.ofDays(3))
+//		.expectNext(0l, 1l)
+//		.thenCancel()
+//		.verify();
+//
+////		Thread.sleep(300);
+//	}
 
 	private Flux<Long> intervalFlux() {
 		return Flux.interval(Duration.ofDays(1)).take(10).log();
+	}
+
+//	@Test
+//	public void connectable_flux() throws InterruptedException {
+//		ConnectableFlux<Integer> publish = Flux.range(1, 50).log().delayElements(Duration.ofMillis(100)).publish();
+//
+//		publish.connect();
+//
+//////		log.info("Sleeping for 300ms");
+////
+////		Thread.sleep(2000l);
+////
+////		publish.subscribe(i -> System.out.println(i+"value"));
+//		
+//		
+//
+//	}
+
+	@Test
+	public void Connectable_Flux_Autoconnect() {
+		Flux<Integer> autoConnect = Flux.range(1, 5).delayElements(Duration.ofMillis(200)).publish().autoConnect(2);
+		
+		StepVerifier.create(autoConnect)
+		.then(autoConnect::subscribe)
+		.expectNext(1, 2,3,4,5)
+		.verifyComplete();
 	}
 
 }
